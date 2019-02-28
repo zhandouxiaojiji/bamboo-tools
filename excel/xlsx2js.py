@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-# lua 配置导表工具
+# js 配置导表工具
 
 # 依赖:
 # 2 xlrd
@@ -65,8 +65,8 @@ def get_value(sheet, row, col):
                     elif char == "]":
                         count = count - 1
                 if value[0] != "[" or value[-1] != "]" or count != 0:
-                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value))
-            return value.replace('[', '{').replace(']', "}")
+                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value)) 
+            return value
         elif t == "map":
             if value == "":
                 value = "{}"
@@ -79,7 +79,7 @@ def get_value(sheet, row, col):
                         count = count - 1
                 if value[0] != "{" or value[-1] != "}" or count != 0:
                     print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value)) 
-            return value.replace(':', '=')
+            return value
         elif t == "code":
             if value == "":
                 value = "nil"
@@ -91,11 +91,10 @@ def get_value(sheet, row, col):
         print(u"请检查%s列%d行的数据:%s" % (keys[col-1], row+1, value)) 
         return "nil"
 
-def xls_to_lua(filename):
-    data = "-- 此配置文件由脚本导出，请勿手动修改\n"
-    data = data + "return {\n"
+def xls_to_js(path, filename):
+    data = "\t" + filename.replace('.xlsx','') + ": {\n"
 
-    workbook = xlrd.open_workbook(filename)
+    workbook = xlrd.open_workbook(path)
 
     for sheet in workbook.sheets():
         if sheet.name.find("#")<0:
@@ -127,7 +126,7 @@ def xls_to_lua(filename):
 
         for row_idx in range(3, row_count):
             if sheet.cell_value(row_idx, 0) != "ignore" and sheet.cell_value(row_idx, 1) != "" and get_value(sheet, row_idx, 1) != "nil":
-                data = data + "    [" + get_value(sheet, row_idx, 1) + "] = {"
+                data = data + "\t\t[" + get_value(sheet, row_idx, 1) + "]: {"
                 for col_idx in range(1, col_count):
                     # print(types[col_idx-11])
                     if types[col_idx-1] != "":
@@ -135,7 +134,7 @@ def xls_to_lua(filename):
                         if value != None:
                             data = data + keys[col_idx-1] + " = " + str(value) + ", "
                 data = data + "},\n"
-    data = data + "}"
+    data = data + "\t},\n"
     return data
 
 def need_export(src, dst):
@@ -153,19 +152,19 @@ if __name__ == '__main__' :
     xls_folder =  sys.argv[1]
     export_folder = sys.argv[2]
 
+    data = "//此配置文件由脚本导出，请勿手动修改\n"
+    data = data + "module.export = {\n"
     for parent,dirnames,filenames in os.walk(xls_folder):    #三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
         for filename in filenames:                        
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
                 path = os.path.join(parent,filename)
-                export_filename = filename.replace('.xlsx','.lua') 
-                export_filename = export_filename.replace('.xls','.lua') 
-                export_path = os.path.join(export_folder,export_filename)
-                if need_export(path, export_path):
-                    print(filename + " => " + export_folder + "/" +  export_filename)
-                    data = xls_to_lua(path)
-                    file = codecs.open(export_path, 'w+', 'utf-8')
-                    file.write(data)
-                    file.close()
+                data = data + xls_to_js(path, filename)
 
-    print (u"lua导出完成")
+    data = data + "\n}"
+    export_path = os.path.join(export_folder,"prop.js")    
+    file = codecs.open(export_path, 'w+', 'utf-8')
+    file.write(data)
+    file.close()
+
+    print (u"js导出完成")
 
