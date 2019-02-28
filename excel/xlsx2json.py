@@ -1,8 +1,4 @@
-﻿#上次修改时间 2018年6月8日14:56:44
-#修改人：ljw
-#修改功能：修改为json格式存储
-
-import os
+﻿import os
 import sys
 import codecs
 import shutil
