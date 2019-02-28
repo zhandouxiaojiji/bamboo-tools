@@ -132,7 +132,7 @@ def xls_to_js(path, filename):
                     if types[col_idx-1] != "":
                         value = get_value(sheet, row_idx, col_idx)
                         if value != None:
-                            data = data + keys[col_idx-1] + " = " + str(value) + ", "
+                            data = data + keys[col_idx-1] + ": " + str(value) + ", "
                 data = data + "},\n"
     data = data + "\t},\n"
     return data
@@ -153,7 +153,7 @@ if __name__ == '__main__' :
     export_folder = sys.argv[2]
 
     data = "//此配置文件由脚本导出，请勿手动修改\n"
-    data = data + "module.export = {\n"
+    data = data + "module.exports = {\n"
     for parent,dirnames,filenames in os.walk(xls_folder):    #三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
         for filename in filenames:                        
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
@@ -166,5 +166,5 @@ if __name__ == '__main__' :
     file.write(data)
     file.close()
 
-    print (u"js导出完成")
+    print (u"导出完成")
 
