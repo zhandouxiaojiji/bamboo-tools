@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 # js 配置导表工具
 
@@ -8,7 +8,7 @@
 ##
 
 
-import xlrd # for read excel
+import xlrd  # for read excel
 import sys
 import codecs
 import os
@@ -20,11 +20,13 @@ sys.setdefaultencoding('utf-8')
 
 types = []
 keys = []
+
+
 def get_value(sheet, row, col):
-    try :
+    try:
 
         t = types[col - 1]
-        value =  sheet.cell_value(row, col)
+        value = sheet.cell_value(row, col)
 
         tp = t[0]
 
@@ -49,7 +51,7 @@ def get_value(sheet, row, col):
         elif t == "lstring":
             if value == "":
                 value = ""
-            return "[[" + str(value) + "]]"
+            return "'" + str(value) + "'"
         elif t == "key":
             if value == "":
                 value = ""
@@ -65,7 +67,8 @@ def get_value(sheet, row, col):
                     elif char == "]":
                         count = count - 1
                 if value[0] != "[" or value[-1] != "]" or count != 0:
-                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value)) 
+                    print(u"请检查%s列%d行table的数据:%s" %
+                          (keys[col-1], row+1, value))
             return value
         elif t == "map":
             if value == "":
@@ -78,7 +81,8 @@ def get_value(sheet, row, col):
                     elif char == "}":
                         count = count - 1
                 if value[0] != "{" or value[-1] != "}" or count != 0:
-                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value)) 
+                    print(u"请检查%s列%d行table的数据:%s" %
+                          (keys[col-1], row+1, value))
             return value
         elif t == "code":
             if value == "":
@@ -86,18 +90,19 @@ def get_value(sheet, row, col):
             return str(value)
         else:
             return "nil"
-        
+
     except BaseException:
-        print(u"请检查%s列%d行的数据:%s" % (keys[col-1], row+1, value)) 
+        print(u"请检查%s列%d行的数据:%s" % (keys[col-1], row+1, value))
         return "nil"
 
+
 def xls_to_js(path, filename):
-    data = "\t" + filename.replace('.xlsx','') + ": {\n"
+    data = "\t" + filename.replace('.xlsx', '') + ": {\n"
 
     workbook = xlrd.open_workbook(path)
 
     for sheet in workbook.sheets():
-        if sheet.name.find("#")<0:
+        if sheet.name.find("#") < 0:
             continue
         # 行数和列数
         row_count = len(sheet.col_values(0))
@@ -112,12 +117,11 @@ def xls_to_js(path, filename):
             if t != "" and t[0] == "*":
                 t = t[1:]
 
-            if t != "int" and t != "number" and t != "string" and t != "array" and t != "map" and t != "code" and t != "key" and t != "lstring" and t != "":
+            if t != "ignore" and t != "int" and t != "number" and t != "string" and t != "array" \
+                    and t != "map" and t != "code" and t != "key" and t != "lstring" and t != "":
                 print(u"请检查第%d列的类型%s" % (col_idx, t))
                 return ""
-
             types.append(rt)
-
 
         global keys
         keys = []
@@ -132,10 +136,12 @@ def xls_to_js(path, filename):
                     if types[col_idx-1] != "":
                         value = get_value(sheet, row_idx, col_idx)
                         if value != None:
-                            data = data + keys[col_idx-1] + ": " + str(value) + ", "
+                            data = data + keys[col_idx-1] + \
+                                ": " + str(value) + ", "
                 data = data + "},\n"
     data = data + "\t},\n"
     return data
+
 
 def need_export(src, dst):
     # print(os.stat(src).st_mtime)
@@ -146,25 +152,25 @@ def need_export(src, dst):
     return True
 
 
-if __name__ == '__main__' :
+if __name__ == '__main__':
     """入口"""
 
-    xls_folder =  sys.argv[1]
+    xls_folder = sys.argv[1]
     export_folder = sys.argv[2]
 
     data = "//此配置文件由脚本导出，请勿手动修改\n"
     data = data + "module.exports = {\n"
-    for parent,dirnames,filenames in os.walk(xls_folder):    #三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
-        for filename in filenames:                        
+    # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
+    for parent, dirnames, filenames in os.walk(xls_folder):
+        for filename in filenames:
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
-                path = os.path.join(parent,filename)
+                path = os.path.join(parent, filename)
                 data = data + xls_to_js(path, filename)
 
     data = data + "\n}"
-    export_path = os.path.join(export_folder,"prop.js")    
+    export_path = os.path.join(export_folder, "prop.js")
     file = codecs.open(export_path, 'w+', 'utf-8')
     file.write(data)
     file.close()
 
     print (u"导出完成")
-
