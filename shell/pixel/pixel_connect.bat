@@ -1,0 +1,1 @@
+adb shell settings put global captive_portal_https_url https://www.google.cn/generate_204
