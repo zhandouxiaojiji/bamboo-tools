@@ -168,6 +168,7 @@ if __name__ == '__main__':
                 data = data + xls_to_ts(path, filename)
 
     data = data + "\n}"
+    print(data)
     export_path = os.path.join(export_folder, "prop.ts")
     file = codecs.open(export_path, 'w+', 'utf-8')
     file.write(data)
