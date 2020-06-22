@@ -173,4 +173,4 @@ if __name__ == '__main__':
     file.write(data)
     file.close()
 
-    print (u"导出完成")
+    print ("导出完成")
