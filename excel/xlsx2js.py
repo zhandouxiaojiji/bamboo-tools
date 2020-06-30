@@ -102,7 +102,7 @@ def xls_to_js(path, filename):
     workbook = xlrd.open_workbook(path)
 
     for sheet in workbook.sheets():
-        if sheet.name.find("#") < 0:
+        if sheet.name.find("#") >= 0:
             continue
         # 行数和列数
         row_count = len(sheet.col_values(0))

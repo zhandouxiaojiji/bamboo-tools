@@ -102,7 +102,7 @@ def xls_to_ts(path, filename):
     workbook = xlrd.open_workbook(path)
 
     for sheet in workbook.sheets():
-        if sheet.name.find("#") < 0:
+        if sheet.name.find("#") >= 0:
             continue
         # 行数和列数
         row_count = len(sheet.col_values(0))
@@ -158,20 +158,22 @@ if __name__ == '__main__':
     xls_folder = sys.argv[1]
     export_folder = sys.argv[2]
 
-    data = "//此配置文件由脚本导出，请勿手动修改\n"
-    data = data + "export default {\n"
+    
     # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
     for parent, dirnames, filenames in os.walk(xls_folder):
         for filename in filenames:
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
+                data = "//此配置文件由脚本导出，请勿手动修改\n"
+                data = data + "export default {\n"
                 path = os.path.join(parent, filename)
                 data = data + xls_to_ts(path, filename)
-
-    data = data + "\n}"
-    print(data)
-    export_path = os.path.join(export_folder, "prop.ts")
-    file = codecs.open(export_path, 'w+', 'utf-8')
-    file.write(data)
-    file.close()
+                data = data + "\n}"
+                print(data)
+                export_filename = filename.replace('.xlsx','.ts') 
+                export_filename = export_filename.replace('.xls','.ts') 
+                export_path = os.path.join(export_folder,export_filename)
+                file = codecs.open(export_path, 'w+', 'utf-8')
+                file.write(data)
+                file.close()
 
     print ("导出完成")
