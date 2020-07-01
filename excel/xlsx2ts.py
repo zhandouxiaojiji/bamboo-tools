@@ -97,7 +97,7 @@ def get_value(sheet, row, col):
 
 
 def xls_to_ts(path, filename):
-    data = "\t" + filename.replace('.xlsx', '') + ": {\n"
+    data = "{\n"
 
     workbook = xlrd.open_workbook(path)
 
@@ -139,7 +139,7 @@ def xls_to_ts(path, filename):
                             data = data + keys[col_idx-1] + \
                                 ": " + str(value) + ", "
                 data = data + "},\n"
-    data = data + "\t},\n"
+    data = data + "}"
     return data
 
 
@@ -164,10 +164,9 @@ if __name__ == '__main__':
         for filename in filenames:
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
                 data = "//此配置文件由脚本导出，请勿手动修改\n"
-                data = data + "export default {\n"
+                data = data + "export default "
                 path = os.path.join(parent, filename)
                 data = data + xls_to_ts(path, filename)
-                data = data + "\n}"
                 print(data)
                 export_filename = filename.replace('.xlsx','.ts') 
                 export_filename = export_filename.replace('.xls','.ts') 
