@@ -126,15 +126,22 @@ def xls_to_lua(filename):
             keys.append(str(sheet.cell_value(1, col_idx)))
 
         for row_idx in range(3, row_count):
+            rule = sheet.cell_value(row_idx, 0);
             if sheet.cell_value(row_idx, 0) != "ignore" and sheet.cell_value(row_idx, 1) != "" and get_value(sheet, row_idx, 1) != "nil":
-                data = data + "    [" + get_value(sheet, row_idx, 1) + "] = {"
-                for col_idx in range(1, col_count):
-                    # print(types[col_idx-11])
-                    if types[col_idx-1] != "":
-                        value = get_value(sheet, row_idx, col_idx)
-                        if value != None:
-                            data = data + keys[col_idx-1] + " = " + str(value) + ", "
-                data = data + "},\n"
+                data = data + "\t\t[" + get_value(sheet, row_idx, 1) + "] = "
+                if rule == "kv":
+                    data = data + get_value(sheet, row_idx, 2)
+                else:
+                    data = data + '{'
+                    for col_idx in range(1, col_count):
+                        # print(types[col_idx-11])
+                        if types[col_idx-1] != "":
+                            value = get_value(sheet, row_idx, col_idx)
+                            if value != None:
+                                data = data + keys[col_idx-1] + \
+                                    "= " + str(value) + ", "
+                    data = data + '}'
+                data = data + ",\n"
     data = data + "}"
     return data
 
