@@ -128,7 +128,7 @@ def xls_to_lua(filename):
         for row_idx in range(3, row_count):
             rule = sheet.cell_value(row_idx, 0);
             if sheet.cell_value(row_idx, 0) != "ignore" and sheet.cell_value(row_idx, 1) != "" and get_value(sheet, row_idx, 1) != "nil":
-                data = data + "\t\t[" + get_value(sheet, row_idx, 1) + "] = "
+                data = data + "\t[" + get_value(sheet, row_idx, 1) + "] = "
                 if rule == "kv":
                     data = data + get_value(sheet, row_idx, 2)
                 else:
