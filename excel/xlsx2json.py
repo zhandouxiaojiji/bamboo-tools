@@ -40,11 +40,11 @@ def get_value(sheet, row, col):
         if t == "int":
             if value == "":
                 value = 0
-            return "%d" % value
+            return int(value)
         elif t == "number":
             if value == "":
                 value = 0.0
-            return "%.2f" % value
+            return value
         elif t == "string":
             if value == "":
                 value = ""
@@ -138,7 +138,7 @@ def xls_to_json(path, filename):
                         if value != None:
                             item[keys[col_idx-1]] = value
                 data[get_value(sheet, row_idx, 1)] = item
-    return json.dumps(data, ensure_ascii=False)
+    return json.dumps(data, ensure_ascii=False, indent=2)
 
 
 def need_export(src, dst):

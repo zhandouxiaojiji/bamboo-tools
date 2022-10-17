@@ -15,8 +15,8 @@ import os
 import os.path
 import platform
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 types = []
 keys = []
@@ -78,7 +78,7 @@ def get_value(sheet, row, col):
                     elif char == "}":
                         count = count - 1
                 if value[0] != "{" or value[-1] != "}" or count != 0:
-                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value)) 
+                    print(u"请检查%s列%d行table的数据:%s" % (keys[col-1], row+1, value))
             return value.replace(':', '=')
         elif t == "code":
             if value == "":
@@ -86,9 +86,9 @@ def get_value(sheet, row, col):
             return str(value)
         else:
             return "nil"
-        
+
     except BaseException:
-        print(u"请检查%s列%d行的数据:%s" % (keys[col-1], row+1, value)) 
+        print(u"请检查%s列%d行的数据:%s" % (keys[col-1], row+1, value))
         return "nil"
 
 def xls_to_lua(filename):
@@ -98,7 +98,7 @@ def xls_to_lua(filename):
     workbook = xlrd.open_workbook(filename)
 
     for sheet in workbook.sheets():
-        if sheet.name.find("#") >= 0:
+        if sheet.name.find("#")>=0:
             continue
         # 行数和列数
         row_count = len(sheet.col_values(0))
@@ -126,22 +126,15 @@ def xls_to_lua(filename):
             keys.append(str(sheet.cell_value(1, col_idx)))
 
         for row_idx in range(3, row_count):
-            rule = sheet.cell_value(row_idx, 0);
             if sheet.cell_value(row_idx, 0) != "ignore" and sheet.cell_value(row_idx, 1) != "" and get_value(sheet, row_idx, 1) != "nil":
-                data = data + "\t[" + get_value(sheet, row_idx, 1) + "] = "
-                if rule == "kv":
-                    data = data + get_value(sheet, row_idx, 2)
-                else:
-                    data = data + '{'
-                    for col_idx in range(1, col_count):
-                        # print(types[col_idx-11])
-                        if types[col_idx-1] != "":
-                            value = get_value(sheet, row_idx, col_idx)
-                            if value != None:
-                                data = data + keys[col_idx-1] + \
-                                    "= " + str(value) + ", "
-                    data = data + '}'
-                data = data + ",\n"
+                data = data + "    [" + get_value(sheet, row_idx, 1) + "] = {"
+                for col_idx in range(1, col_count):
+                    # print(types[col_idx-11])
+                    if types[col_idx-1] != "":
+                        value = get_value(sheet, row_idx, col_idx)
+                        if value != None:
+                            data = data + keys[col_idx-1] + " = " + str(value) + ", "
+                data = data + "},\n"
     data = data + "}"
     return data
 
@@ -161,11 +154,11 @@ if __name__ == '__main__' :
     export_folder = sys.argv[2]
 
     for parent,dirnames,filenames in os.walk(xls_folder):    #三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
-        for filename in filenames:                        
+        for filename in filenames:
             if filename.find('.svn') < 0 and filename.find('$') < 0 and filename.find('.xls') > 0:
                 path = os.path.join(parent,filename)
-                export_filename = filename.replace('.xlsx','.lua') 
-                export_filename = export_filename.replace('.xls','.lua') 
+                export_filename = filename.replace('.xlsx','.lua')
+                export_filename = export_filename.replace('.xls','.lua')
                 export_path = os.path.join(export_folder,export_filename)
                 if need_export(path, export_path):
                     print(filename + " => " + export_folder + "/" +  export_filename)
@@ -174,5 +167,4 @@ if __name__ == '__main__' :
                     file.write(data)
                     file.close()
 
-    print ("导出完成")
-
+    print (u"导出完成")
