@@ -128,6 +128,9 @@ def xls_to_json(path, filename):
         keys = []
         for col_idx in range(1, col_count):
             keys.append(str(sheet.cell_value(1, col_idx)))
+        
+        data["keys"] = []
+        data["values"] = []
 
         for row_idx in range(3, row_count):
             if sheet.cell_value(row_idx, 0) != "ignore" and sheet.cell_value(row_idx, 1) != "" and get_value(sheet, row_idx, 1) != "nil":
@@ -137,7 +140,9 @@ def xls_to_json(path, filename):
                         value = get_value(sheet, row_idx, col_idx)
                         if value != None:
                             item[keys[col_idx-1]] = value
-                data[get_value(sheet, row_idx, 1)] = item
+                data["keys"].append(get_value(sheet, row_idx, 1))
+                data["values"].append(item)
+
     return json.dumps(data, ensure_ascii=False, indent=2)
 
 
