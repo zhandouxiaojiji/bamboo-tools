@@ -16,8 +16,8 @@ import os.path
 import platform
 import json
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 types = []
 keys = []
